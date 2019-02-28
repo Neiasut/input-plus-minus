@@ -10,5 +10,6 @@ export interface InputPlusMinusSettings {
   min?: number;
   max?: number;
   start?: number;
-  step?: number;
+  step?: number | { [key: number]: number };
+  fractions?: number;
 }
