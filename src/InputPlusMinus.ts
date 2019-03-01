@@ -1,15 +1,16 @@
 import {
   checkNumber,
-  checkValidKey,
+  checkStringOnFloat,
   createChanger,
+  getMinBorderFromSteps,
   getNextValue,
   getNextValueByObjectStep,
   getPrevValue,
   getPrevValueByObjectStep,
   issetObject,
+  occurrenceNumberInSection,
   parseStrToNumber,
   prepareInitElement,
-  validateStringOnNumber,
   wrapInput
 } from './functions';
 import './style/InputPlusMinus.scss';
@@ -28,6 +29,7 @@ class InputPlusMinus {
   public self: HTMLInputElement;
   public lastValidValue: number;
   public configuration: InputPlusMinusSettings;
+  public mask: Inputmask.Instance;
   public elements: InputPlusMinusElements = {
     wrapper: null,
     minus: null,
@@ -42,9 +44,9 @@ class InputPlusMinus {
     this.self = prepareInitElement(initElement) as HTMLInputElement;
 
     if (issetSettings) {
-      this.updateConfiguration(settings);
+      this.updateConfiguration(settings, false, true);
     } else {
-      this.updateConfiguration({});
+      this.updateConfiguration({}, false, true);
     }
 
     this.self.classList.add(CLASSES.element);
@@ -59,69 +61,34 @@ class InputPlusMinus {
       CLASSES.plus
     ]);
     this.elements.wrapper.appendChild(this.elements.plus);
+    this.updateStatusChangers();
     this.addEventListeners();
-
-    Inputmask('numeric', {
-      radixPoint: '.',
-      digits: '2',
-      integerDigits: '13',
-      allowMinus: this.configuration.min < 0,
-      groupSeparator: ' ',
-      autoGroup: true,
-      rightAlign: false,
-      max: '' + this.configuration.max,
-      min: '' + this.configuration.min
-    }).mask(this.self);
     console.log(this);
   }
 
   protected addEventListeners(): void {
     this.self.addEventListener('input', this.handleInput);
-    this.self.addEventListener('keydown', this.handleKeydown);
     this.self.addEventListener('blur', this.handleBlur);
-    this.self.addEventListener('focus', this.handleFocus);
-    this.self.addEventListener('paste', this.handlePaste);
     this.elements.minus.addEventListener('click', this.handleMinusClick);
     this.elements.plus.addEventListener('click', this.handlePlusClick);
   }
 
-  protected handleInput = (e: Event): void => {
+  protected handleInput = (): void => {
     const value = this.self.value;
-    if (value === '') {
-      return;
-    }
-    if (
-      typeof e['detail'] === 'object' &&
-      e['detail'] !== null &&
-      e['detail']['type'] === 'notHand'
-    ) {
-      this.onChange(this.self.value, false);
-    }
-    {
-      this.onChange(this.self.value, true);
+    if (this.validateValue(value)) {
+      this.onChange(value);
     }
   };
 
-  protected handlePaste = (e: ClipboardEvent): void => {
-    const data = e.clipboardData.getData('text');
-    if (!validateStringOnNumber(data)) {
-      e.clipboardData.setData('text', parseStrToNumber(data).toString());
+  protected handleBlur = (): void => {
+    const value = this.self.value;
+    const validValue = this.getValidValue(value).toString(
+      this.configuration.digits
+    );
+    if (value !== validValue) {
+      this.self.value = validValue;
+      this.generateEvent('input');
     }
-  };
-
-  protected handleKeydown = (e: KeyboardEvent): void => {
-    if (!checkValidKey(e)) {
-      e.preventDefault();
-      return;
-    }
-  };
-
-  protected handleFocus = () => {
-    this.self.value = parseFloat(this.self.value).toString();
-  };
-
-  protected handleBlur = () => {
-    this.self.value = this.lastValidValue.toString();
   };
 
   protected handleMinusClick = () => {
@@ -132,33 +99,49 @@ class InputPlusMinus {
     this.next();
   };
 
-  protected onChange(value: string, enteredByHand: boolean = false): void {
-    const validValue = this.getValidValue(value);
-    //console.log(value, validValue);
-    if (validValue !== this.lastValidValue) {
-      //console.log('something do');
-    }
-    this.self.value = validValue.toString();
-    this.lastValidValue = validValue;
+  protected onChange(value: string): void {
+    console.log('do something');
+    this.lastValidValue = parseStrToNumber(value);
+    this.updateStatusChangers();
   }
 
-  public updateConfiguration(settings: InputPlusMinusSettings): void {
+  public changeValue(value: number): void {
+    const { min, max } = this.configuration;
+    if (occurrenceNumberInSection(value, min, max)) {
+      this.self.value = value.toString();
+      this.generateEvent('input');
+      return;
+    }
+    throw new Error(`Value "${value}" not allowed!`);
+  }
+
+  public updateConfiguration(
+    settings: InputPlusMinusSettings,
+    fireInput: boolean = false,
+    start: boolean = false
+  ): void {
     let value = this.self.value;
     this.configuration = Object.assign(
       {},
       InputPlusMinus.defaultSettings(),
       settings
     );
-    if (!checkNumber(this.configuration.step)) {
-      this.configuration.min = parseFloat(
-        Object.keys(this.configuration.step).shift()
-      );
+    const step = this.configuration.step;
+    if (!checkNumber(step)) {
+      this.configuration.min = getMinBorderFromSteps(step);
     }
     if (checkNumber(settings.start)) {
       value = settings.start.toString();
     }
     this.lastValidValue = this.getValidValue(value);
     this.self.value = this.lastValidValue.toString();
+    this.updateMask({});
+    if (!start) {
+      this.updateStatusChangers();
+    }
+    if (fireInput) {
+      this.generateEvent('input');
+    }
   }
 
   public next(): void {
@@ -173,30 +156,31 @@ class InputPlusMinus {
     this.changeValue(toValue);
   }
 
-  public changeValue(value: number): void {
-    this.self.value = value.toString();
-    const event = new Event('input');
-    event['detail'] = {
-      type: 'notHand'
-    };
-    this.self.dispatchEvent(event);
+  public validateValue(value: string): boolean {
+    if (!this.mask.isValid()) {
+      return false;
+    }
+    if (!checkStringOnFloat(value)) {
+      return false;
+    }
+    const numb = parseStrToNumber(value);
+    const { min, max } = this.configuration;
+    return occurrenceNumberInSection(numb, min, max);
   }
 
-  public getValidValue(value: number | string): number {
+  public getValidValue(value: string): number {
     const { min, max } = this.configuration;
-    if (typeof value === 'string') {
-      if (value.length < 1) {
-        value = '0';
-      }
-      value = parseStrToNumber(value);
+    const valueNumber = parseStrToNumber(value);
+    if (isNaN(valueNumber)) {
+      return this.lastValidValue;
     }
-    if (value < min) {
+    if (valueNumber < min) {
       return min;
     }
-    if (value > max) {
+    if (valueNumber > max) {
       return max;
     }
-    return value;
+    return valueNumber;
   }
 
   protected getStepNextValue(current: number): number {
@@ -217,6 +201,59 @@ class InputPlusMinus {
     return getPrevValueByObjectStep(current, step, min);
   }
 
+  protected updateMask(options: Inputmask.Options): void {
+    if (this.mask instanceof Inputmask) {
+      this.mask.remove();
+    }
+    const configMask = Object.assign(
+      {},
+      InputPlusMinus.defaultMaskSettings(),
+      this.getMaskSettingsFromConfig(),
+      options
+    );
+    this.mask = Inputmask('numeric', configMask).mask(this.self);
+  }
+
+  protected getMaskSettingsFromConfig(): Inputmask.Options {
+    const { digits, max, min } = this.configuration;
+    return {
+      digits: digits.toString(),
+      max: max.toString(),
+      min: min.toString(),
+      allowMinus: min < 0
+    };
+  }
+
+  protected updateStatusChangers(): void {
+    const value = parseStrToNumber(this.self.value);
+    const { min, max } = this.configuration;
+    const { minus, plus } = this.elements;
+    (minus as HTMLButtonElement).disabled = value <= min;
+    (plus as HTMLButtonElement).disabled = value >= max;
+  }
+
+  protected generateEvent(type: string): void {
+    switch (type) {
+      case 'input': {
+        const event = new Event('input');
+        this.self.dispatchEvent(event);
+        break;
+      }
+    }
+  }
+
+  public static defaultMaskSettings(): Inputmask.Options {
+    return {
+      radixPoint: '.',
+      digits: '2',
+      integerDigits: '13',
+      groupSeparator: ' ',
+      autoGroup: true,
+      rightAlign: false,
+      autoUnmask: true
+    };
+  }
+
   public static defaultSettings(): InputPlusMinusSettings {
     return {
       minusText: '−',
@@ -224,7 +261,7 @@ class InputPlusMinus {
       step: 1,
       min: Number.MIN_SAFE_INTEGER,
       max: Number.MAX_SAFE_INTEGER,
-      fractions: 2
+      digits: 2
     };
   }
 }

@@ -80,9 +80,9 @@ describe('getPrevValue', () => {
 
 describe('getNextValueByObjectStep', () => {
   const step = {
-    0: 1,
-    10: 2,
-    50: 5
+    '-2': 1,
+    '10': 2,
+    '50': 5
   };
   test('getNextValueByObjectStep1', () => {
     expect(getNextValueByObjectStep(2, step, 40)).toEqual(3);
@@ -103,9 +103,9 @@ describe('getNextValueByObjectStep', () => {
 
 describe('getPrevValueByObjectStep', () => {
   const step = {
-    0: 1,
-    11: 2,
-    50: 5
+    '-2': 1,
+    '11': 2,
+    '50': 5
   };
   test('getPrevValueByObjectStep1', () => {
     expect(getPrevValueByObjectStep(2, step, 0)).toEqual(1);

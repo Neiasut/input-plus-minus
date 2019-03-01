@@ -1,3 +1,5 @@
+import { InputPlusMinusSteps } from './interfaces';
+
 export const prepareInitElement = (initElement: Element | string): Element => {
   if (typeof initElement === 'string') {
     const findElement = document.querySelector(initElement);
@@ -38,41 +40,10 @@ export const issetObject = (object: any): object is object =>
 
 export const checkNumber = (x: any): x is number => typeof x === 'number';
 
-const codeIsKey = (code: string): boolean => code.indexOf('Key') !== -1;
-const codeIsPeriod = (code: string): boolean => code === 'Period';
-const codeIsBackSpace = (code: string): boolean => code === 'Backspace';
-const codeIsMinus = (code: string): boolean => code === 'Minus';
-const codeIsDigit = (code: string): boolean => code.indexOf('Digit') !== -1;
-const codeIsValidArrow = (code: string): boolean =>
-  code === 'ArrowLeft' || code === 'ArrowRight';
-
-export const checkValidKey = (e: KeyboardEvent): boolean => {
-  const code = e.code;
-  const ctrlKey = e.ctrlKey;
-  const key = e.key.toLowerCase();
-  if (
-    codeIsPeriod(code) ||
-    codeIsBackSpace(code) ||
-    codeIsDigit(code) ||
-    codeIsMinus(code) ||
-    codeIsValidArrow(code)
-  ) {
-    return true;
-  }
-  if (codeIsKey(code) && ctrlKey && (key === 'c' || key === 'v')) {
-    return true;
-  }
-  return false;
-};
-
 export const parseStrToNumber = (str: string): number => parseFloat(str);
 
-export const validateStringOnNumber = (str: string): boolean =>
-  parseStrToNumber(str).toString() === str;
-
-export const checkNotEndedNumber = (str: string): boolean => {
-  return parseStrToNumber(str).toString() + '.' === str;
-};
+export const checkStringOnFloat = (str: string): boolean =>
+  parseFloat(str).toString() === str;
 
 export const getNextValue = (
   current: number,
@@ -104,9 +75,9 @@ export const getPrevValue = (
 
 const getSectionFromObjectSteps = (
   current: number,
-  steps: { [key: number]: number }
+  steps: [string, number][]
 ): [string, number] => {
-  const arrInfo = Object.entries(steps).reverse();
+  const arrInfo = Array.from(steps).reverse();
   const result = arrInfo
     .filter(info => {
       const [border] = info;
@@ -120,14 +91,29 @@ const getSectionFromObjectSteps = (
   return result;
 };
 
+const sortFnSteps = (a: [string, number], b: [string, number]): number => {
+  return parseStrToNumber(a[0]) - parseStrToNumber(b[0]);
+};
+
+export const sortObjectSteps = (
+  steps: InputPlusMinusSteps
+): [string, number][] => {
+  return Object.entries(steps).sort(sortFnSteps);
+};
+
+const getKeysFromSortedSteps = (arr: [string, number][]): string[] => {
+  return arr.map(el => el[0]);
+};
+
 export const getNextValueByObjectStep = (
   current: number,
-  step: { [key: number]: number },
+  step: InputPlusMinusSteps,
   max: number
 ): number => {
-  const info = getSectionFromObjectSteps(current, step);
+  const list = sortObjectSteps(step);
+  const info = getSectionFromObjectSteps(current, list);
   const [border, stepValue] = info;
-  const keys = Object.keys(step);
+  const keys = getKeysFromSortedSteps(list);
   const indexKey = keys.indexOf(border);
   let maxBorder;
   if (indexKey < keys.length - 1) {
@@ -141,15 +127,16 @@ export const getNextValueByObjectStep = (
 
 export const getPrevValueByObjectStep = (
   current: number,
-  step: { [key: number]: number },
+  step: InputPlusMinusSteps,
   min: number
 ): number => {
-  const info = getSectionFromObjectSteps(current, step);
+  const list = sortObjectSteps(step);
+  const info = getSectionFromObjectSteps(current, list);
   const [border, stepValue] = info;
   const borderVal = parseFloat(border);
   const maxOf = Math.max(min, borderVal);
   if (current === borderVal) {
-    const keys = Object.keys(step);
+    const keys = getKeysFromSortedSteps(list);
     const firstKey = parseFloat(keys[0]);
     if (firstKey === current) {
       return firstKey;
@@ -159,11 +146,16 @@ export const getPrevValueByObjectStep = (
   return getPrevValue(current, stepValue, maxOf, borderVal);
 };
 
+export const getMinBorderFromSteps = (step: InputPlusMinusSteps): number => {
+  const list = sortObjectSteps(step);
+  const min = list[0];
+  return parseStrToNumber(min[0]);
+};
+
 export const occurrenceNumberInSection = (
   numb: number,
   min: number,
   max: number
 ): boolean => !(numb < min || numb > max);
 
-export const checkNegativeDigitString = (str: string): boolean =>
-  str.length > 0 && str[0] === '-';
+
