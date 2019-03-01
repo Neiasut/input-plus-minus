@@ -1,4 +1,8 @@
-import { InputPlusMinusSteps } from './interfaces';
+import {
+  InputPlusMinusGridCompression,
+  InputPlusMinusSteps
+} from './interfaces';
+import * as Inputmask from 'inputmask';
 
 export const prepareInitElement = (initElement: Element | string): Element => {
   if (typeof initElement === 'string') {
@@ -158,4 +162,68 @@ export const occurrenceNumberInSection = (
   max: number
 ): boolean => !(numb < min || numb > max);
 
+export const createGridWrapper = (root: Element, classes = []): Element => {
+  const gridWrapper = document.createElement('div');
+  gridWrapper.classList.add(...classes);
+  root.appendChild(gridWrapper);
+  return gridWrapper;
+};
 
+export const createGridElement = (root: Element, classes = []): Element => {
+  const gridElement = document.createElement('span');
+  gridElement.classList.add(...classes);
+  root.appendChild(gridElement);
+  return gridElement;
+};
+
+export const checkElementIsset = (element: any): boolean =>
+  element instanceof Element;
+
+export const changeTextContentGridElement = (
+  element: Element,
+  value: string,
+  suffix: string
+): void => {
+  element.textContent = value + suffix;
+};
+
+export const compressionNumber = (
+  numb: number,
+  config: InputPlusMinusGridCompression[]
+): string => {
+  const absNumb = Math.abs(numb);
+  const findObject = Array.from(config)
+    .reverse()
+    .find(value => {
+      const del = Math.pow(10, value.compression);
+      console.log(absNumb, del);
+      return absNumb / del >= 1;
+    });
+  return (
+    (numb / Math.pow(10, findObject.compression)).toString() +
+    ' ' +
+    findObject.text
+  );
+};
+
+export const maskedValue = (str: string): string => {
+  return Inputmask.format(str, {
+    alias: 'number',
+    radixPoint: '.',
+    digits: '2',
+    integerDigits: '13',
+    groupSeparator: ' ',
+    autoGroup: true
+  });
+};
+
+export const formatGridElementText = (
+  numb: number,
+  compression: boolean,
+  compressionConfig: InputPlusMinusGridCompression[]
+): string => {
+  if (compression) {
+    return compressionNumber(numb, compressionConfig);
+  }
+  return maskedValue(numb.toString());
+};

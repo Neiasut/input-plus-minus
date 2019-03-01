@@ -1,4 +1,8 @@
 import InputPlusMinus from '../src/InputPlusMinus';
+import {
+  InputPlusMinusEventAfterChange,
+  InputPlusMinusEventBeforeChange
+} from '../src/interfaces';
 
 new InputPlusMinus('#first', {
   start: 50,
@@ -8,7 +12,8 @@ new InputPlusMinus('#first', {
     '50': 5,
     '100': 200
   },
-  max: 20000
+  max: 20000,
+  grid: true
 });
 
 const second = new InputPlusMinus('#second', {
@@ -21,18 +26,34 @@ const second = new InputPlusMinus('#second', {
   max: 20000,
   digits: 0
 });
-/*
-document.getElementById('second').addEventListener('input', () => {
-  console.log('input');
-});*/
+
+const secondInput = document.getElementById('second');
+
+/*secondInput.addEventListener(
+  'beforeChange_InputPlusMinus',
+  (e: InputPlusMinusEventBeforeChange) => {
+    const detail = e.detail;
+    const current = detail.current;
+    console.log('before change', current, detail.next);
+  }
+);
+
+secondInput.addEventListener(
+  'afterChange_InputPlusMinus',
+  (e: InputPlusMinusEventAfterChange) => {
+    const detail = e.detail;
+    console.log('after change', detail);
+  }
+);*/
 
 setTimeout(() => {
   second.updateConfiguration(
     {
       start: 25,
-      min: 30
+      min: 30,
+      grid: true,
+      gridSuffix: ' Р'
     },
     true
   );
-  console.log(second);
 }, 2000);

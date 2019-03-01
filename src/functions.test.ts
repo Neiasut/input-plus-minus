@@ -1,6 +1,8 @@
 import {
-  getNextValue, getNextValueByObjectStep,
-  getPrevValue, getPrevValueByObjectStep,
+  getNextValue,
+  getNextValueByObjectStep,
+  getPrevValue,
+  getPrevValueByObjectStep,
   prepareInitElement
 } from './functions';
 

@@ -1,7 +1,13 @@
 import {
+  changeTextContentGridElement,
+  checkElementIsset,
   checkNumber,
   checkStringOnFloat,
+  compressionNumber,
   createChanger,
+  createGridElement,
+  createGridWrapper,
+  formatGridElementText,
   getMinBorderFromSteps,
   getNextValue,
   getNextValueByObjectStep,
@@ -14,26 +20,45 @@ import {
   wrapInput
 } from './functions';
 import './style/InputPlusMinus.scss';
-import { InputPlusMinusElements, InputPlusMinusSettings } from './interfaces';
+import {
+  InputPlusMinusElements,
+  InputPlusMinusEventData,
+  InputPlusMinusSettings
+} from './interfaces';
 import * as Inputmask from 'inputmask';
+import {
+  createCustomEvent,
+  createObjectEventAfterChange,
+  createObjectEventBeforeChange
+} from './events';
 
 const CLASSES = {
   wrapper: 'InputPlusMinus',
   element: 'InputPlusMinus-Element',
   changer: 'InputPlusMinus-Changer',
   minus: 'InputPlusMinus-Minus',
-  plus: 'InputPlusMinus-Plus'
+  plus: 'InputPlusMinus-Plus',
+  grid: 'InputPlusMinus-Grid',
+  gridElement: 'InputPlusMinus-GridElement',
+  gridElementMin: 'InputPlusMinus-GridElement_min',
+  gridElementMax: 'InputPlusMinus-GridElement_max'
 };
+const MAX_NUMBER = Number.MAX_SAFE_INTEGER;
+const MIN_NUMBER = Number.MIN_SAFE_INTEGER;
 
 class InputPlusMinus {
   public self: HTMLInputElement;
-  public lastValidValue: number;
+  public saveValidValue: number;
   public configuration: InputPlusMinusSettings;
+  public settings: InputPlusMinusSettings;
   public mask: Inputmask.Instance;
   public elements: InputPlusMinusElements = {
     wrapper: null,
     minus: null,
-    plus: null
+    plus: null,
+    grid: null,
+    gridMin: null,
+    gridMax: null
   };
 
   public constructor(
@@ -42,6 +67,8 @@ class InputPlusMinus {
   ) {
     const issetSettings = issetObject(settings);
     this.self = prepareInitElement(initElement) as HTMLInputElement;
+    this.self.classList.add(CLASSES.element);
+    this.elements.wrapper = wrapInput(this.self, CLASSES.wrapper);
 
     if (issetSettings) {
       this.updateConfiguration(settings, false, true);
@@ -49,8 +76,6 @@ class InputPlusMinus {
       this.updateConfiguration({}, false, true);
     }
 
-    this.self.classList.add(CLASSES.element);
-    this.elements.wrapper = wrapInput(this.self, CLASSES.wrapper);
     this.elements.minus = createChanger(this.configuration.minusText, [
       CLASSES.changer,
       CLASSES.minus
@@ -82,9 +107,7 @@ class InputPlusMinus {
 
   protected handleBlur = (): void => {
     const value = this.self.value;
-    const validValue = this.getValidValue(value).toString(
-      this.configuration.digits
-    );
+    const validValue = this.getValidValue(value).toString();
     if (value !== validValue) {
       this.self.value = validValue;
       this.generateEvent('input');
@@ -100,9 +123,22 @@ class InputPlusMinus {
   };
 
   protected onChange(value: string): void {
-    console.log('do something');
-    this.lastValidValue = parseStrToNumber(value);
+    this.generateEvent(
+      'beforeChange',
+      createObjectEventBeforeChange(
+        this,
+        this.saveValidValue,
+        parseStrToNumber(value)
+      )
+    );
+
+    this.saveValidValue = parseStrToNumber(value);
     this.updateStatusChangers();
+
+    this.generateEvent(
+      'afterChange',
+      createObjectEventAfterChange(this, this.saveValidValue)
+    );
   }
 
   public changeValue(value: number): void {
@@ -126,6 +162,7 @@ class InputPlusMinus {
       InputPlusMinus.defaultSettings(),
       settings
     );
+    this.settings = settings;
     const step = this.configuration.step;
     if (!checkNumber(step)) {
       this.configuration.min = getMinBorderFromSteps(step);
@@ -133,9 +170,10 @@ class InputPlusMinus {
     if (checkNumber(settings.start)) {
       value = settings.start.toString();
     }
-    this.lastValidValue = this.getValidValue(value);
-    this.self.value = this.lastValidValue.toString();
+    this.saveValidValue = this.getValidValue(value);
+    this.self.value = this.saveValidValue.toString();
     this.updateMask({});
+    this.createGrid();
     if (!start) {
       this.updateStatusChangers();
     }
@@ -145,13 +183,13 @@ class InputPlusMinus {
   }
 
   public next(): void {
-    const value = this.lastValidValue;
+    const value = this.saveValidValue;
     const toValue = this.getStepNextValue(value);
     this.changeValue(toValue);
   }
 
   public prev(): void {
-    const value = this.lastValidValue;
+    const value = this.saveValidValue;
     const toValue = this.getStepPrevValue(value);
     this.changeValue(toValue);
   }
@@ -172,7 +210,7 @@ class InputPlusMinus {
     const { min, max } = this.configuration;
     const valueNumber = parseStrToNumber(value);
     if (isNaN(valueNumber)) {
-      return this.lastValidValue;
+      return this.saveValidValue;
     }
     if (valueNumber < min) {
       return min;
@@ -232,13 +270,85 @@ class InputPlusMinus {
     (plus as HTMLButtonElement).disabled = value >= max;
   }
 
-  protected generateEvent(type: string): void {
+  protected generateEvent(type: string, data?: InputPlusMinusEventData): void {
+    let event;
+    const self = this.self;
     switch (type) {
-      case 'input': {
-        const event = new Event('input');
-        this.self.dispatchEvent(event);
+      case 'input':
+        event = new Event('input');
+        self.dispatchEvent(event);
         break;
+      case 'beforeChange':
+      case 'afterChange':
+        event = createCustomEvent(type, data);
+        self.dispatchEvent(event);
+        break;
+      default:
+        throw new Error(`Event with name: "${type}" can't generate`);
+    }
+  }
+
+  protected getBorderValues(): { min: number; max: number } {
+    const minFromConfig = this.configuration.min;
+    const { min, max: maxUse } = this.settings;
+    const configMinNotIsBorder = minFromConfig === MIN_NUMBER;
+    const minUse = min || (configMinNotIsBorder ? null : minFromConfig);
+    return {
+      min: minUse,
+      max: maxUse
+    };
+  }
+
+  protected createGrid(): void {
+    this.removeGrid();
+    const { grid, gridSuffix } = this.configuration;
+    const { min, max } = this.getBorderValues();
+    const issetMin = checkNumber(min);
+    const issetMax = checkNumber(max);
+    if (grid && (issetMax || issetMin)) {
+      let gridWrapper = this.elements.grid;
+      if (!checkElementIsset(gridWrapper)) {
+        gridWrapper = createGridWrapper(this.elements.wrapper, [CLASSES.grid]);
+        this.elements.grid = gridWrapper;
       }
+      if (issetMin) {
+        let gridMin = this.elements.gridMin;
+        if (!checkElementIsset(gridMin)) {
+          gridMin = createGridElement(gridWrapper, [
+            CLASSES.gridElement,
+            CLASSES.gridElementMin
+          ]);
+          this.elements.gridMin = gridMin;
+        }
+        let minText = compressionNumber(
+          min,
+          this.configuration.gridCompressionValues
+        );
+        changeTextContentGridElement(gridMin, minText, gridSuffix);
+      }
+      if (issetMax) {
+        let gridMax = this.elements.gridMax;
+        if (!checkElementIsset(gridMax)) {
+          gridMax = createGridElement(gridWrapper, [
+            CLASSES.gridElement,
+            CLASSES.gridElementMax
+          ]);
+          this.elements.gridMax = gridMax;
+        }
+        let maxText = formatGridElementText(
+          max,
+          this.configuration.gridCompression,
+          this.configuration.gridCompressionValues
+        );
+        changeTextContentGridElement(gridMax, maxText, gridSuffix);
+      }
+    }
+  }
+
+  protected removeGrid(): void {
+    const grid = this.elements.grid;
+    if (checkElementIsset(grid)) {
+      grid.parentNode.removeChild(grid);
     }
   }
 
@@ -259,9 +369,18 @@ class InputPlusMinus {
       minusText: '−',
       plusText: '+',
       step: 1,
-      min: Number.MIN_SAFE_INTEGER,
-      max: Number.MAX_SAFE_INTEGER,
-      digits: 2
+      min: MIN_NUMBER,
+      max: MAX_NUMBER,
+      digits: 2,
+      grid: false,
+      gridSuffix: '',
+      gridCompression: true,
+      gridCompressionValues: [
+        { text: '', compression: 0, digits: 0 },
+        { text: 'тыс.', compression: 3, digits: 0 },
+        { text: 'млн.', compression: 6, digits: 1 },
+        { text: 'млрд.', compression: 9, digits: 1 }
+      ]
     };
   }
 }
