@@ -1,9 +1,12 @@
 import {
+  calculationCompressionValue,
+  compressionNumber,
   getNextValue,
   getNextValueByObjectStep,
   getPrevValue,
   getPrevValueByObjectStep,
-  prepareInitElement
+  prepareInitElement,
+  removalOfUnnecessaryDigits
 } from './functions';
 
 describe('prepareInitElement', () => {
@@ -133,5 +136,57 @@ describe('getPrevValueByObjectStep', () => {
   });
   test('getPrevValueByObjectStep7', () => {
     expect(getPrevValueByObjectStep(50, step, 0)).toEqual(49);
+  });
+});
+
+describe('calculationCompressionValue', () => {
+  test('calculationCompressionValue(200000, 3) === 200', () => {
+    expect(calculationCompressionValue(200000, 3)).toEqual(200);
+  });
+  test('calculationCompressionValue(211111, 3) === 211.111', () => {
+    expect(calculationCompressionValue(211111, 3)).toEqual(211.111);
+  });
+});
+
+describe('removalOfUnnecessaryDigits', () => {
+  test('removalOfUnnecessaryDigits(2.123, 1) === "2.1"', () => {
+    expect(removalOfUnnecessaryDigits(2.123, 1) === '2.1');
+  });
+  test('removalOfUnnecessaryDigits(2.153, 1) === "2.1"', () => {
+    expect(removalOfUnnecessaryDigits(2.153, 1) === '2.1');
+  });
+  test('removalOfUnnecessaryDigits(2, 2) === "2"', () => {
+    expect(removalOfUnnecessaryDigits(2, 2) === '2');
+  });
+});
+
+describe('compressionNumber', () => {
+  const gridCompression = [
+    { text: '', compression: 0, digits: 0 },
+    { text: 'тыс.', compression: 3, digits: 0 },
+    { text: 'млн.', compression: 6, digits: 1 },
+    { text: 'млрд.', compression: 9, digits: 1 }
+  ];
+  test('compressionNumber(960) === "960"', () => {
+    expect(compressionNumber(960, gridCompression)).toEqual('960');
+  });
+  test('compressionNumber(2000) === "2 тыс."', () => {
+    expect(compressionNumber(2000, gridCompression)).toEqual('2 тыс.');
+  });
+  test('compressionNumber(2010) === "2 тыс."', () => {
+    expect(compressionNumber(2010, gridCompression)).toEqual('2 тыс.');
+  });
+  test('compressionNumber(2010) === "2 тыс."', () => {
+    expect(compressionNumber(2088, gridCompression)).toEqual('2 тыс.');
+  });
+  test('compressionNumber(6590500) === "6.6 млн."', () => {
+    expect(compressionNumber(6600000, gridCompression)).toEqual('6.6 млн.');
+  });
+  test('compressionNumber(6600000) === "6.6 млн."', () => {
+    expect(compressionNumber(6600000, gridCompression)).toEqual('6.6 млн.');
+  });
+  test('compressionNumber(6600000.1232) === "6600000"', () => {
+    const grid = [{ text: '', compression: 0, digits: 0 }];
+    expect(compressionNumber(6600000, grid)).toEqual('6 600 000');
   });
 });

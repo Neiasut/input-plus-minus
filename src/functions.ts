@@ -184,7 +184,37 @@ export const changeTextContentGridElement = (
   value: string,
   suffix: string
 ): void => {
-  element.textContent = value + suffix;
+  const arr = [value];
+  if (suffix !== '') {
+    arr.push(suffix);
+  }
+  element.textContent = arr.join(' ');
+};
+
+export const calculationCompressionValue = (
+  numb: number,
+  compression: number
+): number => {
+  const del = Math.pow(10, compression);
+  return numb / del;
+};
+
+export const removalOfUnnecessaryDigits = (x: number, digits: number): string =>
+  x.toFixed(digits);
+
+export const maskedValue = (
+  str: string,
+  customConfig: Inputmask.Options
+): string => {
+  const BASE = {
+    alias: 'numeric',
+    radixPoint: '.',
+    digits: '2',
+    integerDigits: '13',
+    groupSeparator: ' ',
+    autoGroup: true
+  };
+  return Inputmask.format(str, Object.assign({}, BASE, customConfig));
 };
 
 export const compressionNumber = (
@@ -195,26 +225,19 @@ export const compressionNumber = (
   const findObject = Array.from(config)
     .reverse()
     .find(value => {
-      const del = Math.pow(10, value.compression);
-      console.log(absNumb, del);
-      return absNumb / del >= 1;
+      return calculationCompressionValue(absNumb, value.compression) >= 1;
     });
-  return (
-    (numb / Math.pow(10, findObject.compression)).toString() +
-    ' ' +
-    findObject.text
+  const resultNumb = calculationCompressionValue(numb, findObject.compression);
+  const resultNumbString = maskedValue(
+    removalOfUnnecessaryDigits(resultNumb, findObject.digits),
+    {
+      digits: findObject.digits.toString()
+    }
   );
-};
-
-export const maskedValue = (str: string): string => {
-  return Inputmask.format(str, {
-    alias: 'number',
-    radixPoint: '.',
-    digits: '2',
-    integerDigits: '13',
-    groupSeparator: ' ',
-    autoGroup: true
-  });
+  if (findObject.text) {
+    return resultNumbString + ' ' + findObject.text;
+  }
+  return resultNumbString;
 };
 
 export const formatGridElementText = (
@@ -225,5 +248,5 @@ export const formatGridElementText = (
   if (compression) {
     return compressionNumber(numb, compressionConfig);
   }
-  return maskedValue(numb.toString());
+  return maskedValue(numb.toString(), {});
 };

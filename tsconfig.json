@@ -8,7 +8,8 @@
     "baseUrl": ".",
     "target": "es2018",
     "allowJs": false,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "src/*",

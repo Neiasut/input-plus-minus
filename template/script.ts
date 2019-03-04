@@ -29,7 +29,7 @@ const second = new InputPlusMinus('#second', {
 
 const secondInput = document.getElementById('second');
 
-/*secondInput.addEventListener(
+secondInput.addEventListener(
   'beforeChange_InputPlusMinus',
   (e: InputPlusMinusEventBeforeChange) => {
     const detail = e.detail;
@@ -44,7 +44,7 @@ secondInput.addEventListener(
     const detail = e.detail;
     console.log('after change', detail);
   }
-);*/
+);
 
 setTimeout(() => {
   second.updateConfiguration(
@@ -57,3 +57,19 @@ setTimeout(() => {
     true
   );
 }, 2000);
+
+new InputPlusMinus('#third', {
+  start: 50000,
+  grid: true,
+  gridCompression: false,
+  step: {
+    '-2000': 1,
+    '10': 2,
+    '50': 5
+  },
+  max: 21000000,
+  digits: 1,
+  gridSuffix: 'Р'
+});
+
+new InputPlusMinus('#el4');

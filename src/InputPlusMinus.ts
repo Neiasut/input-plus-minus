@@ -3,7 +3,6 @@ import {
   checkElementIsset,
   checkNumber,
   checkStringOnFloat,
-  compressionNumber,
   createChanger,
   createGridElement,
   createGridWrapper,
@@ -25,12 +24,12 @@ import {
   InputPlusMinusEventData,
   InputPlusMinusSettings
 } from './interfaces';
-import * as Inputmask from 'inputmask';
 import {
   createCustomEvent,
   createObjectEventAfterChange,
   createObjectEventBeforeChange
 } from './events';
+import Inputmask from 'inputmask';
 
 const CLASSES = {
   wrapper: 'InputPlusMinus',
@@ -88,7 +87,6 @@ class InputPlusMinus {
     this.elements.wrapper.appendChild(this.elements.plus);
     this.updateStatusChangers();
     this.addEventListeners();
-    console.log(this);
   }
 
   protected addEventListeners(): void {
@@ -170,6 +168,9 @@ class InputPlusMinus {
     if (checkNumber(settings.start)) {
       value = settings.start.toString();
     }
+    if (!checkStringOnFloat(value)) {
+      value = '0';
+    }
     this.saveValidValue = this.getValidValue(value);
     this.self.value = this.saveValidValue.toString();
     this.updateMask({});
@@ -194,7 +195,7 @@ class InputPlusMinus {
     this.changeValue(toValue);
   }
 
-  public validateValue(value: string): boolean {
+  protected validateValue(value: string): boolean {
     if (!this.mask.isValid()) {
       return false;
     }
@@ -206,7 +207,7 @@ class InputPlusMinus {
     return occurrenceNumberInSection(numb, min, max);
   }
 
-  public getValidValue(value: string): number {
+  protected getValidValue(value: string): number {
     const { min, max } = this.configuration;
     const valueNumber = parseStrToNumber(value);
     if (isNaN(valueNumber)) {
@@ -240,7 +241,7 @@ class InputPlusMinus {
   }
 
   protected updateMask(options: Inputmask.Options): void {
-    if (this.mask instanceof Inputmask) {
+    if (issetObject(this.mask) && this.mask instanceof Inputmask) {
       this.mask.remove();
     }
     const configMask = Object.assign(
@@ -320,8 +321,9 @@ class InputPlusMinus {
           ]);
           this.elements.gridMin = gridMin;
         }
-        let minText = compressionNumber(
+        let minText = formatGridElementText(
           min,
+          this.configuration.gridCompression,
           this.configuration.gridCompressionValues
         );
         changeTextContentGridElement(gridMin, minText, gridSuffix);

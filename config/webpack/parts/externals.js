@@ -1,5 +1,7 @@
-module.exports = {
-  externals: {
-    Inputmask: 'Inputmask'
-  }
+module.exports = () => {
+  return {
+    externals: {
+      inputmask: 'Inputmask'
+    }
+  };
 };
