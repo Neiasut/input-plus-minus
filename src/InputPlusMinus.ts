@@ -96,6 +96,13 @@ class InputPlusMinus {
     this.elements.plus.addEventListener('click', this.handlePlusClick);
   }
 
+  protected removeEventListeners(): void {
+    this.self.removeEventListener('input', this.handleInput);
+    this.self.removeEventListener('blur', this.handleBlur);
+    this.elements.minus.addEventListener('click', this.handleMinusClick);
+    this.elements.plus.addEventListener('click', this.handlePlusClick);
+  }
+
   protected handleInput = (): void => {
     const value = this.self.value;
     if (this.validateValue(value)) {
@@ -352,6 +359,16 @@ class InputPlusMinus {
     if (checkElementIsset(grid)) {
       grid.parentNode.removeChild(grid);
     }
+  }
+
+  public destructor(): void {
+    const self = this.self;
+    const parent = this.elements.wrapper.parentNode;
+    self.classList.remove(CLASSES.element);
+    this.removeEventListeners();
+    parent.appendChild(self);
+    parent.removeChild(this.elements.wrapper);
+    this.mask.remove();
   }
 
   public static defaultMaskSettings(): Inputmask.Options {

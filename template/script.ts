@@ -72,4 +72,8 @@ new InputPlusMinus('#third', {
   gridSuffix: 'Р'
 });
 
-new InputPlusMinus('#el4');
+const el4 = new InputPlusMinus('#el4');
+
+setTimeout(() => {
+  el4.destructor();
+}, 3000);

@@ -6,7 +6,6 @@ beforeAll(() => {
   element.setAttribute('type', 'text');
   element.id = 'test';
   document.body.appendChild(element);
-  console.log(element);
 }, 0);
 
 describe('typicalObjectOnEvent', () => {
