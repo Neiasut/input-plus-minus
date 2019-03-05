@@ -9,6 +9,8 @@ export interface InputPlusMinusElements {
   gridMax: Element;
 }
 
+export type InputPlusMinusEvents = 'input' | 'beforeChange' | 'afterChange';
+
 export interface InputPlusMinusSteps {
   [key: string]: number;
 }
@@ -31,6 +33,8 @@ export interface InputPlusMinusSettings {
   gridSuffix?: string;
   gridCompression?: boolean;
   gridCompressionValues?: InputPlusMinusGridCompression[];
+  beforeChange?(data: InputPlusMinusEventDataBeforeChange): void;
+  afterChange?(data: InputPlusMinusEventDataAfterChange): void;
 }
 
 export interface InputPlusMinusEventData {
@@ -54,4 +58,16 @@ export interface InputPlusMinusEventDataAfterChange
 
 export interface InputPlusMinusEventAfterChange extends CustomEvent {
   detail: InputPlusMinusEventDataAfterChange;
+}
+
+export type callbackFn = (data: InputPlusMinusEventData) => void;
+export type listCallbacks = Map<string, CallbackSaveElement>;
+
+interface CallbackSaveElement {
+  eventName: InputPlusMinusEvents;
+  cb?: callbackFn;
+}
+
+export interface CallbackSaveElementExtend extends CallbackSaveElement {
+  key: string;
 }

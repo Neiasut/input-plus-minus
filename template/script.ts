@@ -1,7 +1,8 @@
 import InputPlusMinus from '../src/InputPlusMinus';
 import {
   InputPlusMinusEventAfterChange,
-  InputPlusMinusEventBeforeChange
+  InputPlusMinusEventBeforeChange,
+  InputPlusMinusEventDataBeforeChange
 } from '../src/interfaces';
 
 new InputPlusMinus('#first', {
@@ -24,8 +25,19 @@ const second = new InputPlusMinus('#second', {
     '50': 5
   },
   max: 20000,
-  digits: 0
+  digits: 0,
+  beforeChange(data: InputPlusMinusEventDataBeforeChange): void {
+    console.log(data);
+  }
 });
+
+second.callbacks.add(
+  'test',
+  'beforeChange',
+  (data: InputPlusMinusEventDataBeforeChange) => {
+    console.log(data);
+  }
+);
 
 const secondInput = document.getElementById('second');
 

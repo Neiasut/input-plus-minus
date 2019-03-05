@@ -22,6 +22,7 @@ import './style/InputPlusMinus.scss';
 import {
   InputPlusMinusElements,
   InputPlusMinusEventData,
+  InputPlusMinusEvents,
   InputPlusMinusSettings
 } from './interfaces';
 import {
@@ -30,6 +31,7 @@ import {
   createObjectEventBeforeChange
 } from './events';
 import Inputmask from 'inputmask';
+import Callbacks from './Callbacks';
 
 const CLASSES = {
   wrapper: 'InputPlusMinus',
@@ -51,6 +53,7 @@ class InputPlusMinus {
   public configuration: InputPlusMinusSettings;
   public settings: InputPlusMinusSettings;
   public mask: Inputmask.Instance;
+  public callbacks: Callbacks;
   public elements: InputPlusMinusElements = {
     wrapper: null,
     minus: null,
@@ -68,6 +71,7 @@ class InputPlusMinus {
     this.self = prepareInitElement(initElement) as HTMLInputElement;
     this.self.classList.add(CLASSES.element);
     this.elements.wrapper = wrapInput(this.self, CLASSES.wrapper);
+    this.callbacks = new Callbacks();
 
     if (issetSettings) {
       this.updateConfiguration(settings, false, true);
@@ -278,7 +282,10 @@ class InputPlusMinus {
     (plus as HTMLButtonElement).disabled = value >= max;
   }
 
-  protected generateEvent(type: string, data?: InputPlusMinusEventData): void {
+  protected generateEvent(
+    type: InputPlusMinusEvents,
+    data?: InputPlusMinusEventData
+  ): void {
     let event;
     const self = this.self;
     switch (type) {
@@ -288,6 +295,7 @@ class InputPlusMinus {
         break;
       case 'beforeChange':
       case 'afterChange':
+        this.callbacks.fireCallbacksByType(type, data);
         event = createCustomEvent(type, data);
         self.dispatchEvent(event);
         break;
@@ -364,6 +372,7 @@ class InputPlusMinus {
   public destructor(): void {
     const self = this.self;
     const parent = this.elements.wrapper.parentNode;
+    this.callbacks.destructor();
     self.classList.remove(CLASSES.element);
     this.removeEventListeners();
     parent.appendChild(self);

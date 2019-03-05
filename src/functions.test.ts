@@ -1,6 +1,7 @@
 import {
   calculationCompressionValue,
   compressionNumber,
+  filterListCallbacksByType,
   getNextValue,
   getNextValueByObjectStep,
   getPrevValue,
@@ -8,6 +9,7 @@ import {
   prepareInitElement,
   removalOfUnnecessaryDigits
 } from './functions';
+import { listCallbacks } from './interfaces';
 
 describe('prepareInitElement', () => {
   test('prepareInitElement will be error', () => {
@@ -188,5 +190,22 @@ describe('compressionNumber', () => {
   test('compressionNumber(6600000.1232) === "6600000"', () => {
     const grid = [{ text: '', compression: 0, digits: 0 }];
     expect(compressionNumber(6600000, grid)).toEqual('6 600 000');
+  });
+});
+
+describe('filterListCallbacksByType', () => {
+  const elements: listCallbacks = new Map();
+  elements.set('test', {
+    eventName: 'afterChange',
+    cb: () => {}
+  });
+  elements.set('test2', {
+    eventName: 'beforeChange',
+    cb: () => {}
+  });
+  test('filterListCallbacksByType1', () => {
+    const result = filterListCallbacksByType(elements, 'beforeChange');
+    expect(result.length).toEqual(1);
+    expect(result[0].key).toEqual('test2');
   });
 });

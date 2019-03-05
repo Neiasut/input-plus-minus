@@ -1,6 +1,9 @@
 import {
+  CallbackSaveElementExtend,
+  InputPlusMinusEvents,
   InputPlusMinusGridCompression,
-  InputPlusMinusSteps
+  InputPlusMinusSteps,
+  listCallbacks
 } from './interfaces';
 import * as Inputmask from 'inputmask';
 
@@ -249,4 +252,21 @@ export const formatGridElementText = (
     return compressionNumber(numb, compressionConfig);
   }
   return maskedValue(numb.toString(), {});
+};
+
+export const filterListCallbacksByType = (
+  list: listCallbacks,
+  type: InputPlusMinusEvents
+): CallbackSaveElementExtend[] => {
+  return Array.from(list.entries())
+    .filter(element => {
+      const list = element[1];
+      return type === list.eventName;
+    })
+    .map(element => {
+      return {
+        key: element[0],
+        ...element[1]
+      };
+    });
 };
