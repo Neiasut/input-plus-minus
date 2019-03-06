@@ -184,7 +184,11 @@ class InputPlusMinus {
     this.themes = Array.isArray(themes) ? themes : [];
     const step = this.configuration.step;
     if (!checkNumber(step)) {
-      this.configuration.min = getMinBorderFromSteps(step);
+      const minFromSteps = getMinBorderFromSteps(step);
+      const min = this.usedChanges.min;
+      if (checkNumber(min) && minFromSteps > min) {
+        this.configuration.min = getMinBorderFromSteps(step);
+      }
     }
     if (checkNumber(settings.start)) {
       value = settings.start.toString();

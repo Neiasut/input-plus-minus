@@ -16,6 +16,7 @@ new InputPlusMinus('#first', {
     '50': 5,
     '100': 200
   },
+  min: 10,
   max: 20000,
   grid: true
 });
