@@ -1,9 +1,12 @@
+import './themes';
 import InputPlusMinus from '../src/InputPlusMinus';
 import {
   InputPlusMinusEventAfterChange,
   InputPlusMinusEventBeforeChange,
   InputPlusMinusEventDataBeforeChange
 } from '../src/interfaces';
+
+console.dir(InputPlusMinus.themes);
 
 new InputPlusMinus('#first', {
   start: 50,
@@ -25,10 +28,7 @@ const second = new InputPlusMinus('#second', {
     '50': 5
   },
   max: 20000,
-  digits: 0,
-  beforeChange(data: InputPlusMinusEventDataBeforeChange): void {
-    console.log(data);
-  }
+  digits: 0
 });
 
 second.callbacks.add(
@@ -64,8 +64,12 @@ setTimeout(() => {
       start: 25,
       min: 30,
       grid: true,
+      step: {
+        40: 1
+      },
       gridSuffix: ' Р'
     },
+    [],
     true
   );
 }, 2000);
@@ -89,3 +93,5 @@ const el4 = new InputPlusMinus('#el4');
 setTimeout(() => {
   el4.destructor();
 }, 3000);
+
+new InputPlusMinus('#el5', {}, ['test']);

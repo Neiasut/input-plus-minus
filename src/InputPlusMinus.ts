@@ -32,6 +32,7 @@ import {
 } from './events';
 import Inputmask from 'inputmask';
 import Callbacks from './Callbacks';
+import InputPlusMinusThemes from './InputPlusMinusThemes';
 
 const CLASSES = {
   wrapper: 'InputPlusMinus',
@@ -51,9 +52,11 @@ class InputPlusMinus {
   public self: HTMLInputElement;
   public saveValidValue: number;
   public configuration: InputPlusMinusSettings;
-  public settings: InputPlusMinusSettings;
+  protected usedChanges: InputPlusMinusSettings;
   public mask: Inputmask.Instance;
   public callbacks: Callbacks;
+  protected themes: string[] = [];
+  public static themes: InputPlusMinusThemes = new InputPlusMinusThemes();
   public elements: InputPlusMinusElements = {
     wrapper: null,
     minus: null,
@@ -65,7 +68,8 @@ class InputPlusMinus {
 
   public constructor(
     initElement: Element | string,
-    settings?: InputPlusMinusSettings
+    settings?: InputPlusMinusSettings,
+    themes?: string[]
   ) {
     const issetSettings = issetObject(settings);
     this.self = prepareInitElement(initElement) as HTMLInputElement;
@@ -74,9 +78,9 @@ class InputPlusMinus {
     this.callbacks = new Callbacks();
 
     if (issetSettings) {
-      this.updateConfiguration(settings, false, true);
+      this.updateConfiguration(settings, themes, false, true);
     } else {
-      this.updateConfiguration({}, false, true);
+      this.updateConfiguration({}, themes, false, true);
     }
 
     this.elements.minus = createChanger(this.configuration.minusText, [
@@ -162,16 +166,22 @@ class InputPlusMinus {
 
   public updateConfiguration(
     settings: InputPlusMinusSettings,
+    themes?: string[],
     fireInput: boolean = false,
     start: boolean = false
   ): void {
     let value = this.self.value;
+    this.usedChanges = Object.assign(
+      {},
+      InputPlusMinus.themes.getThemesObject(themes),
+      settings
+    );
     this.configuration = Object.assign(
       {},
       InputPlusMinus.defaultSettings(),
-      settings
+      this.usedChanges
     );
-    this.settings = settings;
+    this.themes = Array.isArray(themes) ? themes : [];
     const step = this.configuration.step;
     if (!checkNumber(step)) {
       this.configuration.min = getMinBorderFromSteps(step);
@@ -304,11 +314,16 @@ class InputPlusMinus {
     }
   }
 
-  protected getBorderValues(): { min: number; max: number } {
-    const minFromConfig = this.configuration.min;
-    const { min, max: maxUse } = this.settings;
-    const configMinNotIsBorder = minFromConfig === MIN_NUMBER;
-    const minUse = min || (configMinNotIsBorder ? null : minFromConfig);
+  protected getBorderValuesFromChanges(): { min: number; max: number } {
+    const { min, max } = this.configuration;
+    let minUse;
+    let maxUse;
+    if (min !== InputPlusMinus.defaultSettings().min) {
+      minUse = min;
+    }
+    if (max !== InputPlusMinus.defaultSettings().max) {
+      maxUse = max;
+    }
     return {
       min: minUse,
       max: maxUse
@@ -318,7 +333,7 @@ class InputPlusMinus {
   protected createGrid(): void {
     this.removeGrid();
     const { grid, gridSuffix } = this.configuration;
-    const { min, max } = this.getBorderValues();
+    const { min, max } = this.getBorderValuesFromChanges();
     const issetMin = checkNumber(min);
     const issetMax = checkNumber(max);
     if (grid && (issetMax || issetMin)) {

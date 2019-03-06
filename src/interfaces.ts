@@ -33,8 +33,6 @@ export interface InputPlusMinusSettings {
   gridSuffix?: string;
   gridCompression?: boolean;
   gridCompressionValues?: InputPlusMinusGridCompression[];
-  beforeChange?(data: InputPlusMinusEventDataBeforeChange): void;
-  afterChange?(data: InputPlusMinusEventDataAfterChange): void;
 }
 
 export interface InputPlusMinusEventData {

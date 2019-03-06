@@ -26,11 +26,8 @@ class Callbacks {
     });
   }
 
-  public remove(key: string): void {
-    if (!this.checkIssetKey(key)) {
-      throw new Error(`Value does not exist`);
-    }
-    this.list.delete(key);
+  public remove(key: string): boolean {
+    return this.list.delete(key);
   }
 
   public fireCallbacksByType(
@@ -46,6 +43,10 @@ class Callbacks {
 
   protected checkIssetKey(key: string): boolean {
     return this.list.has(key);
+  }
+
+  public getList(): listCallbacks {
+    return this.list;
   }
 
   public destructor(): void {
