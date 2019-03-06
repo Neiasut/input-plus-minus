@@ -51,9 +51,9 @@ const MIN_NUMBER = Number.MIN_SAFE_INTEGER;
 class InputPlusMinus {
   public self: HTMLInputElement;
   public saveValidValue: number;
-  public configuration: InputPlusMinusSettings;
+  protected configuration: InputPlusMinusSettings;
   protected usedChanges: InputPlusMinusSettings;
-  public mask: Inputmask.Instance;
+  protected mask: Inputmask.Instance;
   public callbacks: Callbacks;
   protected themes: string[] = [];
   public static themes: InputPlusMinusThemes = new InputPlusMinusThemes();
