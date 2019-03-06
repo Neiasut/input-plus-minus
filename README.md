@@ -6,13 +6,23 @@ Library depends on [Inputmask](https://github.com/RobinHerbots/Inputmask).
 
 ## Setup
 
+### add with:
+#### npm
+```cmd
+npm install input-plus-minus --save
+```
+#### yarn
+```cmd
+yarn add input-plus-minus
+```
+
 ### Classic web with script tag
 ```js
 <script src="public/InputPlusMinusWindow.js"></script>
 ```
 
 ### ES6 import
-```js
+```typescript
 import InputPlusMinus from 'InputPlusMinus';
 ```
 
