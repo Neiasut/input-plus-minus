@@ -198,6 +198,9 @@ export const calculationCompressionValue = (
   numb: number,
   compression: number
 ): number => {
+  if (compression === 0) {
+    return numb;
+  }
   const del = Math.pow(10, compression);
   return numb / del;
 };
@@ -228,7 +231,10 @@ export const compressionNumber = (
   const findObject = Array.from(config)
     .reverse()
     .find(value => {
-      return calculationCompressionValue(absNumb, value.compression) >= 1;
+      if (value.compression === 0) {
+        return true;
+      }
+      return calculationCompressionValue(absNumb, value.compression) > 1;
     });
   const resultNumb = calculationCompressionValue(numb, findObject.compression);
   const resultNumbString = maskedValue(

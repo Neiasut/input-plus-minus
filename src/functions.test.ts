@@ -175,6 +175,14 @@ describe('calculationCompressionValue', () => {
   test('calculationCompressionValue(211111, 3) === 211.111', () => {
     expect(calculationCompressionValue(211111, 3)).toEqual(211.111);
   });
+
+  test('calculationCompressionValue(0, 0) === 0', () => {
+    expect(calculationCompressionValue(0, 0)).toEqual(0);
+  });
+
+  test('calculationCompressionValue(0.5, 0) === 0', () => {
+    expect(calculationCompressionValue(0.5, 0)).toEqual(0.5);
+  });
 });
 
 describe('removalOfUnnecessaryDigits', () => {
@@ -198,6 +206,14 @@ describe('compressionNumber', () => {
     { text: 'млн.', compression: 6, digits: 1 },
     { text: 'млрд.', compression: 9, digits: 1 }
   ];
+
+  test('compressionNumber(0) === "0"', () => {
+    expect(compressionNumber(0, gridCompression)).toEqual('0');
+  });
+
+  test('compressionNumber(0.5) === "0.5"', () => {
+    expect(compressionNumber(0.5, gridCompression)).toEqual('1');
+  });
 
   test('compressionNumber(960) === "960"', () => {
     expect(compressionNumber(960, gridCompression)).toEqual('960');
