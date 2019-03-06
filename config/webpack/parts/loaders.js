@@ -8,7 +8,7 @@ module.exports = function(argv) {
         {
           test: /\.ts?$/,
           exclude: /node_modules/,
-          use: ['ts-loader']
+          use: ['babel-loader']
         },
         {
           test: /\.(sa|sc|c)ss$/,
