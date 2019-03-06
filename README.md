@@ -2,23 +2,29 @@
 
 input-plus-minus is a ts library creates stylized input.
 
-Library depends on https://github.com/RobinHerbots/Inputmask
+Library depends on [Inputmask](https://github.com/RobinHerbots/Inputmask).
 
-# Setup
+## Setup
 
-<h3>Classic web with `<script>` tag</h3>
-`<script src="public/InputPlusMinusWindow.js"></script>`
+### Classic web with script tag
+```js
+<script src="public/InputPlusMinusWindow.js"></script>
+```
 
-<h3>ES6 import</h3>
-`import InputPlusMinus from 'InputPlusMinus';`
+### ES6 import
+```js
+import InputPlusMinus from 'InputPlusMinus';
+```
 
-# Usage
+## Usage
+```js
+InputPlusMinus('#id');
+```
 
-`InputPlusMinus('#id')`
+## Settings
 
-# Settings
-
-`interface InputPlusMinusSettings {
+```typescript
+interface InputPlusMinusSettings {
   plusText?: string;
   minusText?: string;
   min?: number;
@@ -30,32 +36,132 @@ Library depends on https://github.com/RobinHerbots/Inputmask
   gridSuffix?: string;
   gridCompression?: boolean;
   gridCompressionValues?: InputPlusMinusGridCompression[];
-}`
+}
+```
 
-# Fields
+## Fields
 
-<h3>elements: InputPlusMinusElements</h3>
-<h3>saveValidValue: number</h3>
+### elements
+```typescript
+elements: InputPlusMinusElements
+```
+### saveValidValue
 last valid number
-<h3>self: HTMLInputElement</h3>
-<h3>callbacks: Callbacks</h3>
+```typescript
+saveValidValue: number
+```
+### self
+```typescript
+self: HTMLInputElement
+```
+### callbacks
+```typescript
+callbacks: Callbacks
+```
 
-# Methods
+## Methods
 
-<h3>constructor</h3>
-`constructor(initElement: Element | string, settings?: InputPlusMinusSettings, themes?: string[])`
-<h3>changeValue</h3>
-`changeValue(value: number): void`
-<h3>updateConfiguration</h3>
-`updateConfiguration(
+### constructor
+```typescript
+constructor(initElement: Element | string, settings?: InputPlusMinusSettings, themes?: string[])
+```
+### changeValue
+```typescript
+changeValue(value: number): void
+```
+### updateConfiguration
+```typescript
+updateConfiguration(
     settings: InputPlusMinusSettings,
     themes?: string[],
     fireInput: boolean = false,
     start: boolean = false
-): void`
-<h3>next</h3>
-`next(): void`
-<h3>prev</h3>
-`prev(): void`
-<h3>destructor</h3>
-`destructor(): void`
+): void
+```
+### next
+```typescript
+next(): void
+```
+### prev
+```typescript
+prev(): void
+```
+### destructor
+```typescript
+destructor(): void
+```
+
+## Interfaces and types
+
+###InputPlusMinusElements
+```typescript
+interface InputPlusMinusElements {
+  wrapper: Element;
+  minus: Element;
+  plus: Element;
+  grid: Element;
+  gridMin: Element;
+  gridMax: Element;
+}
+```
+
+### InputPlusMinusEvents
+```typescript
+type InputPlusMinusEvents = 'input' | 'beforeChange' | 'afterChange'
+```
+
+### InputPlusMinusSteps
+```typescript
+interface InputPlusMinusSteps {
+  [key: string]: number;
+}
+```
+
+### InputPlusMinusGridCompression
+```typescript
+interface InputPlusMinusGridCompression {
+  text: string;
+  compression: number;
+  digits: number;
+}
+```
+
+## Events
+* beforeChange
+* afterChange
+```typescript
+const second = new InputPlusMinus('#second');
+const secondInput = document.getElementById('#second');
+secondInput.addEventListener(
+  'beforeChange_InputPlusMinus',
+  (e: InputPlusMinusEventBeforeChange) => {
+    const detail = e.detail;
+    const current = detail.current;
+    console.log('before change', current, detail.next);
+  }
+);
+```
+
+## Callbacks
+* beforeChange
+* afterChange
+
+add
+```typescript
+const example = new InputPlusMinus('#example');
+example.callbacks.add(
+  'test',
+  'beforeChange',
+  (data: InputPlusMinusEventDataBeforeChange) => {
+    console.log(data);
+  }
+);
+```
+
+remove
+```typescript
+const example = new InputPlusMinus('#example');
+example.callbacks.remove(
+  'test'
+);
+```
