@@ -37,6 +37,7 @@ export const createChanger = (
   classesChanger: string[]
 ): Element => {
   const changer = document.createElement('button');
+  changer.setAttribute('type', 'button');
   changer.classList.add(...classesChanger);
   changer.textContent = symbol;
   return changer;
