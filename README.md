@@ -93,7 +93,7 @@ destructor(): void
 
 ## Interfaces and types
 
-###InputPlusMinusElements
+### InputPlusMinusElements
 ```typescript
 interface InputPlusMinusElements {
   wrapper: Element;
