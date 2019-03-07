@@ -1,10 +1,11 @@
 {
   "name": "input-plus-minus",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "wrapper around input",
   "main": "src/InputPlusMinus.ts",
   "author": "neiasut<kerlaeeda@gmail.com>",
   "license": "MIT",
+  "keywords": ["input", "custom", "step"],
   "repository": {
     "type": "git",
     "url": "https://github.com/Neiasut/input-plus-minus.git"
