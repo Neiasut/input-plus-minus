@@ -192,7 +192,7 @@ export const changeTextContentGridElement = (
   if (suffix !== '') {
     arr.push(suffix);
   }
-  element.textContent = arr.join(' ');
+  element.innerHTML = arr.join(' ');
 };
 
 export const calculationCompressionValue = (
