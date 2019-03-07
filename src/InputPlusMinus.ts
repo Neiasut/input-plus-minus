@@ -397,6 +397,9 @@ class InputPlusMinus {
     const grid = this.elements.grid;
     if (checkElementIsset(grid)) {
       grid.parentNode.removeChild(grid);
+      this.elements.grid = null;
+      this.elements.gridMin = null;
+      this.elements.gridMax = null;
     }
   }
 

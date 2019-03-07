@@ -64,7 +64,7 @@ setTimeout(() => {
     {
       start: 25,
       min: 30,
-      grid: true,
+      grid: false,
       step: {
         40: 1
       },
@@ -73,6 +73,22 @@ setTimeout(() => {
     [],
     true
   );
+  setTimeout(() => {
+    second.updateConfiguration(
+      {
+        start: 25,
+        min: 30,
+        grid: false,
+        step: {
+          40: 1
+        },
+        gridSuffix: ' Р'
+      },
+      [],
+      true
+    );
+    console.log(second);
+  }, 200);
 }, 2000);
 
 new InputPlusMinus('#third', {
