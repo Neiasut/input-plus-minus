@@ -39,7 +39,7 @@ export const createChanger = (
   const changer = document.createElement('button');
   changer.setAttribute('type', 'button');
   changer.classList.add(...classesChanger);
-  changer.textContent = symbol;
+  changer.innerHTML = symbol;
   return changer;
 };
 
