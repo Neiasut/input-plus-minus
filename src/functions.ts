@@ -277,3 +277,31 @@ export const filterListCallbacksByType = (
       };
     });
 };
+
+export const getNameTheme = (rootName: string, themeName: string): string =>
+  `${rootName}_theme_${themeName}`;
+
+export const arrNameThemesToArrClasses = (
+  rootName: string,
+  arrNameThemes: string[]
+): string[] => {
+  return arrNameThemes.map(nameTheme => getNameTheme(rootName, nameTheme));
+};
+
+export const addClassesThemes = (
+  element: Element,
+  rootName: string,
+  arrNameThemes: string[]
+): void => {
+  const arrClasses = arrNameThemesToArrClasses(rootName, arrNameThemes);
+  element.classList.add(...arrClasses);
+};
+
+export const removeClassesThemes = (
+  element: Element,
+  rootName: string,
+  arrNameThemes: string[]
+): void => {
+  const arrClasses = arrNameThemesToArrClasses(rootName, arrNameThemes);
+  element.classList.remove(...arrClasses);
+};

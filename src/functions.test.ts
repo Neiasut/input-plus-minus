@@ -1,13 +1,17 @@
 import {
+  addClassesThemes,
+  arrNameThemesToArrClasses,
   calculationCompressionValue,
   compressionNumber,
   filterListCallbacksByType,
+  getNameTheme,
   getNextValue,
   getNextValueByObjectStep,
   getPrevValue,
   getPrevValueByObjectStep,
   prepareInitElement,
-  removalOfUnnecessaryDigits
+  removalOfUnnecessaryDigits,
+  removeClassesThemes
 } from './functions';
 import { listCallbacks } from './interfaces';
 
@@ -261,4 +265,43 @@ describe('filterListCallbacksByType', () => {
     expect(result.length).toEqual(1);
     expect(result[0].key).toEqual('test2');
   });
+});
+
+test('getNameTheme', () => {
+  const nameRoot = 'InputPlusMinus';
+  expect(getNameTheme(nameRoot, 'test')).toEqual('InputPlusMinus_theme_test');
+  expect(getNameTheme('test', 'test')).toEqual('test_theme_test');
+});
+
+test('arrNameThemesToArrClasses', () => {
+  const testArrThemes = ['ex1', 'ex3'];
+  const root = '2';
+  const result = arrNameThemesToArrClasses(root, testArrThemes);
+  expect(result).toHaveLength(2);
+  expect(result[0]).toEqual('2_theme_ex1');
+});
+
+test('addClassesThemes', () => {
+  const testArrThemes = ['ex1', 'ex3'];
+  const root = '2';
+  document.body.innerHTML = '<div id="test"></div>';
+  const testEl = document.getElementById('test');
+  addClassesThemes(testEl, root, testArrThemes);
+  const classList = testEl.classList;
+  expect(classList.contains('2_theme_ex1')).toEqual(true);
+  expect(classList.contains('2_theme_ex3')).toEqual(true);
+  document.body.innerHTML = '';
+});
+
+test('removeClassesThemes', () => {
+  const testArrThemes = ['ex1', 'ex3'];
+  const root = '2';
+  document.body.innerHTML = '<div id="test"></div>';
+  const testEl = document.getElementById('test');
+  addClassesThemes(testEl, root, testArrThemes);
+  removeClassesThemes(testEl, root, testArrThemes);
+  const classList = testEl.classList;
+  expect(classList.contains('2_theme_ex1')).toEqual(false);
+  expect(classList.contains('2_theme_ex3')).toEqual(false);
+  document.body.innerHTML = '';
 });

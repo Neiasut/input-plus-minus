@@ -1,4 +1,5 @@
 import {
+  addClassesThemes,
   changeTextContentGridElement,
   checkElementIsset,
   checkNumber,
@@ -15,7 +16,7 @@ import {
   issetObject,
   occurrenceNumberInSection,
   parseStrToNumber,
-  prepareInitElement,
+  prepareInitElement, removeClassesThemes,
   wrapInput
 } from './functions';
 import './style/InputPlusMinus.scss';
@@ -193,7 +194,11 @@ class InputPlusMinus {
       InputPlusMinus.defaultSettings(),
       this.usedChanges
     );
+
+    removeClassesThemes(this.elements.wrapper, CLASSES.wrapper, this.themes);
     this.themes = Array.isArray(themes) ? themes : [];
+    addClassesThemes(this.elements.wrapper, CLASSES.wrapper, this.themes);
+
     const step = this.configuration.step;
     if (!checkNumber(step)) {
       const minFromSteps = getMinBorderFromSteps(step);
