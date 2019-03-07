@@ -1,6 +1,6 @@
 {
   "name": "input-plus-minus",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "wrapper around input",
   "main": "src/InputPlusMinus.ts",
   "author": "neiasut<kerlaeeda@gmail.com>",
