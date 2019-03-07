@@ -96,3 +96,6 @@ setTimeout(() => {
 }, 3000);
 
 new InputPlusMinus('#el5', {}, ['test']);
+
+console.log(InputPlusMinus.getInstance('#el4'));
+console.log(InputPlusMinus.getInstance(secondInput));

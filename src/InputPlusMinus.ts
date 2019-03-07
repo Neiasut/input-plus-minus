@@ -58,6 +58,11 @@ class InputPlusMinus {
   public callbacks: Callbacks;
   protected themes: string[] = [];
   public static themes: InputPlusMinusThemes = new InputPlusMinusThemes();
+  protected static instances: WeakMap<
+    HTMLInputElement,
+    InputPlusMinus
+  > = new WeakMap();
+
   public elements: InputPlusMinusElements = {
     wrapper: null,
     minus: null,
@@ -74,6 +79,9 @@ class InputPlusMinus {
   ) {
     const issetSettings = issetObject(settings);
     this.self = prepareInitElement(initElement) as HTMLInputElement;
+    if (InputPlusMinus.checkInstance(this.self)) {
+      throw new Error('This element has instance!');
+    }
     this.self.classList.add(CLASSES.element);
     this.elements.wrapper = wrapInput(this.self, CLASSES.wrapper);
     this.callbacks = new Callbacks();
@@ -96,6 +104,8 @@ class InputPlusMinus {
     this.elements.wrapper.appendChild(this.elements.plus);
     this.updateStatusChangers();
     this.addEventListeners();
+
+    InputPlusMinus.addInstanceToList(this);
   }
 
   protected addEventListeners(): void {
@@ -399,6 +409,7 @@ class InputPlusMinus {
     parent.appendChild(self);
     parent.removeChild(this.elements.wrapper);
     this.mask.remove();
+    InputPlusMinus.removeInstanceFromList(self);
   }
 
   public static defaultMaskSettings(): Inputmask.Options {
@@ -431,6 +442,29 @@ class InputPlusMinus {
         { text: 'млрд.', compression: 9, digits: 1 }
       ]
     };
+  }
+
+  public static getInstance(info: Element | string): InputPlusMinus {
+    const instances = this.instances;
+    const element = prepareInitElement(info) as HTMLInputElement;
+    if (instances.has(element)) {
+      return instances.get(element);
+    }
+    throw new Error(`Нет инициализированного элемента!`);
+  }
+
+  public static checkInstance(info: HTMLInputElement): boolean {
+    return this.instances.has(info);
+  }
+
+  protected static addInstanceToList(instanceElement: InputPlusMinus): void {
+    this.instances.set(instanceElement.self, instanceElement);
+  }
+
+  protected static removeInstanceFromList(
+    instanceElement: HTMLInputElement
+  ): void {
+    this.instances.delete(instanceElement);
   }
 }
 

@@ -37,4 +37,27 @@ test('destructor', () => {
   const nameTag = (parent as Element).tagName.toLowerCase();
   expect(nameTag === 'body').toEqual(true);
   expect(element.classList.contains('InputPlusMinus-Element')).toEqual(false);
+  expect(() => {
+    InputPlusMinus.getInstance('#test');
+  }).toThrow();
+});
+
+test('double init', () => {
+  new InputPlusMinus('#test');
+  expect(() => {
+    new InputPlusMinus('#test');
+  }).toThrow();
+});
+
+test('get isset instance', () => {
+  new InputPlusMinus('#test');
+  const element = document.getElementById('test');
+  expect(InputPlusMinus.getInstance(element)).toBeInstanceOf(InputPlusMinus);
+  expect(InputPlusMinus.getInstance('#test')).toBeInstanceOf(InputPlusMinus);
+});
+
+test('get not isset instance', () => {
+  expect(() => {
+    InputPlusMinus.getInstance('#test');
+  }).toThrow();
 });

@@ -27,8 +27,8 @@ import InputPlusMinus from 'InputPlusMinus';
 ```
 
 ## Usage
-```js
-InputPlusMinus('#id');
+```typescript
+InputPlusMinus('#id', InputPlusMinusSettings, ['themes']);
 ```
 
 ## Settings
@@ -174,4 +174,16 @@ const example = new InputPlusMinus('#example');
 example.callbacks.remove(
   'test'
 );
+```
+
+## Static callbacks
+
+### getInstance
+```typescript
+InputPlusMinus.getInstance(info: Element | string): InputPlusMinus;
+```
+
+### checkInstance
+```typescript
+InputPlusMinus.checkInstance(info: HTMLInputElement): boolean;
 ```
