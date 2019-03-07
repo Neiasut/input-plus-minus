@@ -51,6 +51,7 @@ const MIN_NUMBER = Number.MIN_SAFE_INTEGER;
 class InputPlusMinus {
   public self: HTMLInputElement;
   public saveValidValue: number;
+  protected lastInputValue: string;
   protected configuration: InputPlusMinusSettings;
   protected usedChanges: InputPlusMinusSettings;
   protected mask: Inputmask.Instance;
@@ -113,13 +114,14 @@ class InputPlusMinus {
 
   protected handleInput = (): void => {
     const value = this.self.value;
+    this.lastInputValue = value;
     if (this.validateValue(value)) {
       this.onChange(value);
     }
   };
 
   protected handleBlur = (): void => {
-    const value = this.self.value;
+    const value = this.lastInputValue;
     const validValue = this.getValidValue(value).toString();
     if (value !== validValue) {
       this.self.value = validValue;
