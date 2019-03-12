@@ -11,7 +11,8 @@ import {
   getPrevValueByObjectStep,
   prepareInitElement,
   removalOfUnnecessaryDigits,
-  removeClassesThemes
+  removeClassesThemes,
+  thumbCreatorDefault
 } from './functions';
 import { listCallbacks } from './interfaces';
 
@@ -303,5 +304,16 @@ test('removeClassesThemes', () => {
   const classList = testEl.classList;
   expect(classList.contains('2_theme_ex1')).toEqual(false);
   expect(classList.contains('2_theme_ex3')).toEqual(false);
+  document.body.innerHTML = '';
+});
+
+test('thumbCreatorDefault', () => {
+  document.body.innerHTML =
+    '<label for="test" id="label-test">test</label><input id="test">';
+  const input = document.getElementById('test') as HTMLInputElement;
+  const label = document.getElementById('label-test');
+  thumbCreatorDefault('test', input);
+  expect(label.textContent).toEqual('test, test');
+  expect(label.innerHTML).toEqual('test<span>, test</span>');
   document.body.innerHTML = '';
 });

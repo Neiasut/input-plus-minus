@@ -29,7 +29,8 @@ const second = new InputPlusMinus('#second', {
     '50': 5
   },
   max: 20000,
-  digits: 0
+  digits: 0,
+  thumb: 'test'
 });
 
 second.callbacks.add(
@@ -82,7 +83,8 @@ setTimeout(() => {
         step: {
           40: 1
         },
-        gridSuffix: ' Р'
+        gridSuffix: ' Р',
+        thumb: '<b>some</b>'
       },
       [],
       true
@@ -105,7 +107,9 @@ new InputPlusMinus('#third', {
   gridSuffix: 'Р'
 });
 
-const el4 = new InputPlusMinus('#el4');
+const el4 = new InputPlusMinus('#el4', {
+  thumb: 'test'
+});
 
 setTimeout(() => {
   el4.destructor();

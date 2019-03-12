@@ -16,7 +16,9 @@ import {
   issetObject,
   occurrenceNumberInSection,
   parseStrToNumber,
-  prepareInitElement, removeClassesThemes,
+  prepareInitElement,
+  removeClassesThemes,
+  thumbCreatorDefault,
   wrapInput
 } from './functions';
 import './style/InputPlusMinus.scss';
@@ -70,7 +72,8 @@ class InputPlusMinus {
     plus: null,
     grid: null,
     gridMin: null,
-    gridMax: null
+    gridMax: null,
+    thumb: null
   };
 
   public constructor(
@@ -217,6 +220,7 @@ class InputPlusMinus {
     this.self.value = this.saveValidValue.toString();
     this.updateMask({});
     this.createGrid();
+    this.createThumb();
     if (!start) {
       this.updateStatusChangers();
     }
@@ -408,6 +412,22 @@ class InputPlusMinus {
     }
   }
 
+  protected createThumb(): void {
+    this.removeThumb();
+    const { thumb, thumbCreator } = this.configuration;
+    if (typeof thumb === 'string') {
+      this.elements.thumb = thumbCreator(thumb, this.self);
+    }
+  }
+
+  protected removeThumb(): void {
+    const { thumb } = this.elements;
+    if (checkElementIsset(thumb)) {
+      thumb.parentNode.removeChild(thumb);
+      this.elements.thumb = null;
+    }
+  }
+
   public destructor(): void {
     const self = this.self;
     const parent = this.elements.wrapper.parentNode;
@@ -417,6 +437,7 @@ class InputPlusMinus {
     parent.appendChild(self);
     parent.removeChild(this.elements.wrapper);
     this.mask.remove();
+    this.removeThumb();
     InputPlusMinus.removeInstanceFromList(self);
   }
 
@@ -448,7 +469,8 @@ class InputPlusMinus {
         { text: 'тыс.', compression: 3, digits: 0 },
         { text: 'млн.', compression: 6, digits: 1 },
         { text: 'млрд.', compression: 9, digits: 1 }
-      ]
+      ],
+      thumbCreator: thumbCreatorDefault
     };
   }
 

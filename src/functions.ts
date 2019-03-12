@@ -305,3 +305,18 @@ export const removeClassesThemes = (
   const arrClasses = arrNameThemesToArrClasses(rootName, arrNameThemes);
   element.classList.remove(...arrClasses);
 };
+
+export const thumbCreatorDefault = (
+  thumb: string,
+  input: HTMLInputElement
+): Element => {
+  const id = input.id;
+  const label = document.querySelector(`[for="${id}"]`);
+  if (typeof id === 'string' && checkElementIsset(label)) {
+    const thumbElement = document.createElement('span');
+    thumbElement.innerHTML = ', ' + thumb;
+    label.appendChild(thumbElement);
+    return thumbElement;
+  }
+  return null;
+};

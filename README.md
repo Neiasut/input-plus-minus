@@ -46,6 +46,8 @@ interface InputPlusMinusSettings {
   gridSuffix?: string;
   gridCompression?: boolean;
   gridCompressionValues?: InputPlusMinusGridCompression[];
+  thumb?: string;
+  thumbCreator?: (thumb: string, input: HTMLInputElement) => Element;
 }
 ```
 

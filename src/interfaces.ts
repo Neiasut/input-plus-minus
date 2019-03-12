@@ -7,6 +7,7 @@ export interface InputPlusMinusElements {
   grid: Element;
   gridMin: Element;
   gridMax: Element;
+  thumb: Element;
 }
 
 export type InputPlusMinusEvents = 'input' | 'beforeChange' | 'afterChange';
@@ -33,6 +34,8 @@ export interface InputPlusMinusSettings {
   gridSuffix?: string;
   gridCompression?: boolean;
   gridCompressionValues?: InputPlusMinusGridCompression[];
+  thumb?: string;
+  thumbCreator?: (thumb: string, input: HTMLInputElement) => Element;
 }
 
 export interface InputPlusMinusEventData {
