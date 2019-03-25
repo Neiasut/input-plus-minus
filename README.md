@@ -189,3 +189,6 @@ InputPlusMinus.getInstance(info: Element | string): InputPlusMinus;
 ```typescript
 InputPlusMinus.checkInstance(info: HTMLInputElement): boolean;
 ```
+
+## Compatibility with ie11
+Include to your project packages classlist-polyfill and custom-event-polyfill
