@@ -7,6 +7,7 @@ import {
   createChanger,
   createGridElement,
   createGridWrapper,
+  createTypicalEvent,
   formatGridElementText,
   getMinBorderFromSteps,
   getNextValue,
@@ -325,7 +326,7 @@ class InputPlusMinus {
     const self = this.self;
     switch (type) {
       case 'input':
-        event = new Event('input');
+        event = createTypicalEvent('input');
         self.dispatchEvent(event);
         break;
       case 'beforeChange':

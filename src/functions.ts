@@ -177,6 +177,7 @@ export const createGridElement = (root: Element, classes = []): Element => {
   const gridElement = document.createElement('span');
   gridElement.classList.add(...classes);
   root.appendChild(gridElement);
+  console.log(...classes, gridElement.classList);
   return gridElement;
 };
 
@@ -294,7 +295,9 @@ export const addClassesThemes = (
   arrNameThemes: string[]
 ): void => {
   const arrClasses = arrNameThemesToArrClasses(rootName, arrNameThemes);
-  element.classList.add(...arrClasses);
+  if (arrClasses.length) {
+    element.classList.add(...arrClasses);
+  }
 };
 
 export const removeClassesThemes = (
@@ -303,7 +306,9 @@ export const removeClassesThemes = (
   arrNameThemes: string[]
 ): void => {
   const arrClasses = arrNameThemesToArrClasses(rootName, arrNameThemes);
-  element.classList.remove(...arrClasses);
+  if (arrClasses.length) {
+    element.classList.remove(...arrClasses);
+  }
 };
 
 export const thumbCreatorDefault = (
@@ -319,4 +324,15 @@ export const thumbCreatorDefault = (
     return thumbElement;
   }
   return null;
+};
+
+export const createTypicalEvent = (nameEvent: string): Event => {
+  let event;
+  if (typeof Event === 'function') {
+    event = new Event(nameEvent);
+  } else {
+    event = document.createEvent('Event');
+    event.initEvent(nameEvent, true, true);
+  }
+  return event;
 };

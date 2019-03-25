@@ -5,7 +5,11 @@
   "main": "src/InputPlusMinus.ts",
   "author": "neiasut<kerlaeeda@gmail.com>",
   "license": "MIT",
-  "keywords": ["input", "custom", "step"],
+  "keywords": [
+    "input",
+    "custom",
+    "step"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Neiasut/input-plus-minus.git"
@@ -55,6 +59,8 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
+    "classlist-polyfill": "^1.2.0",
+    "custom-event-polyfill": "^1.0.6",
     "inputmask": "4.0.6"
   }
 }
