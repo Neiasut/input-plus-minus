@@ -218,8 +218,8 @@ class InputPlusMinus {
       value = '0';
     }
     this.saveValidValue = this.getValidValue(value);
-    this.self.value = this.saveValidValue.toString();
     this.updateMask({});
+    this.self.value = this.saveValidValue.toString();
     this.createGrid();
     this.createThumb();
     if (!start) {

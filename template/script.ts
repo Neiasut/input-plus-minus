@@ -119,3 +119,57 @@ new InputPlusMinus('#el5', {}, ['test']);
 
 console.log(InputPlusMinus.getInstance('#el4'));
 console.log(InputPlusMinus.getInstance(secondInput));
+
+const el6 = new InputPlusMinus('#el6', {
+  min: 5000,
+  max: 30000000,
+  start: 5000,
+  grid: false,
+  step: {
+    0: 5000,
+    200000: 50000,
+    1000000: 500000
+  }
+});
+
+document.getElementById('el_6_RU').addEventListener('click', () => {
+  el6.updateConfiguration({
+    min: 5000,
+    max: 30000000,
+    start: 5000,
+    grid: false,
+    step: {
+      0: 5000,
+      200000: 50000,
+      1000000: 500000
+    }
+  });
+});
+
+document.getElementById('el_6_USD').addEventListener('click', () => {
+  el6.updateConfiguration({
+    min: 75,
+    max: 100000,
+    start: 75,
+    grid: false,
+    step: {
+      0: 5000,
+      200000: 50000,
+      1000000: 500000
+    }
+  });
+});
+
+document.getElementById('el_6_EUR').addEventListener('click', () => {
+  el6.updateConfiguration({
+    min: 75,
+    max: 100000,
+    start: 75,
+    grid: false,
+    step: {
+      0: 5000,
+      200000: 50000,
+      1000000: 500000
+    }
+  });
+});
